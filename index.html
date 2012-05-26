@@ -1,0 +1,122 @@
+<html>
+  <head>
+    <title>
+      
+    </title>
+    <style>
+      .jqnyc
+       {
+        background-color: red;
+        display: inline-block;
+        float: left;
+        height: 200px;
+        margin-bottom: 20px;
+        margin-right: 10px;
+        width: 200px;
+        
+        *float: left; /* IE */
+       }
+      .jqnyc.carousel
+       {
+        overflow: hidden;
+       }
+      .jqnyc.carousel .container
+       {
+        background-color: green;
+        clear: both;
+        float: left;
+        height: 50%;
+        overflow: hidden;
+        width: 100%;
+       }  
+       .jqnyc.carousel .content
+       {
+        background-color: green;
+        float: left;
+        height: 100%;
+        width: 100%;
+       }      
+      .jqnyc.carousel .left
+       {
+        float: left; 
+       }
+      .jqnyc.carousel .right
+       {
+        float: right; 
+       }      
+    </style>
+    <script type="text/javascript" src="js/libs/jquery/jquery-1.7.2.min.js">     
+    </script>
+    <script type="text/javascript" src="js/libs/jquery/plugins/jqnyc.carousel-1.0.js">     
+    </script>
+    <script type="text/javascript">
+      $(document).ready(function () {
+
+        // This is the code someone would use to use our carousel          
+          
+        function leftAction()
+         {
+          alert('left');          
+         }
+
+        function rightAction()
+         {
+          alert('right');
+         }
+                   
+        $("div.jqnyc.carousel").carousel({
+                                          "left" : leftAction,
+                                          "right" : rightAction
+                                         });
+
+      });
+    </script>
+  </head>
+  <body>
+    <div class="jqnyc carousel">
+      <a href="" class="left">
+        left
+      </a>
+      <a href="" class="right">
+        right
+      </a>
+
+      <div class="container">
+        <div class="content">
+          content
+        </div>
+        <div class="content">
+          content
+        </div>
+        <div class="content">
+          content
+        </div>
+      </div>
+    </div>
+    
+     <div class="jqnyc carousel">
+      <a href="" class="left">
+        left
+      </a>
+      <a href="" class="right">
+        right
+      </a>
+      <div class="container">
+        <div class="content">
+          content
+        </div>
+        <div class="content">
+          content
+        </div>
+        <div class="content">
+          content
+        </div>
+      </div>
+    </div>
+    
+    <div class="jqnyc messagebox">
+     c
+    </div>
+    
+  </body>
+</html>
