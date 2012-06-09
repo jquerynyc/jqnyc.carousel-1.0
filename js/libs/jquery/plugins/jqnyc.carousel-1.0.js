@@ -28,7 +28,19 @@
   {
    var jqInit = $.fn.init,
        jqInitObject;
-   
+
+   function _ (fn)      // local function that facilitates chainability
+    {
+     return function (args)
+             {
+              debugger;
+              return this.prototype.chain(function () 
+                                          { 
+                                           fn.call(this, args); 
+                                          }); 
+             };
+    }
+       
    // getConfig - always used to contain class/plugin arguments
    function getConfig()
     {
@@ -58,8 +70,9 @@
      console.log('ARGS: ', args);
      if (typeof args === 'function')
       {
+       //debugger;
        console && console.log("Called as a function");
-       return $.fn.curReturn.each(args);  // handles chaining of method
+       return jqInitObject.each(args);  // handles chaining of method
       }
      else
       {
@@ -68,7 +81,7 @@
 
        classCode = getPluginClass(config.version),         // get a reference to the plugin OOP code
        classObject = new classCode(args);                   // instantiate plugin Class (which is OOP)
-       pluginObject = $.fn[pluginName] = classObject.chainability;
+       pluginObject = $.fn[pluginName] = classObject.chain;
        $.extend(pluginObject.prototype, classObject); // augment your plugin's prototype with your object
        $.extend(pluginObject, classObject);            // same here.
                 
@@ -86,14 +99,14 @@
     {
      return function (args)
              {
-              this.chainability = jQuerify;
+              this.chain = jQuerify;
               
               // Version - directly exposed to be access via $(...).plugin.version
               this.version = pluginVersion;
               
               // Public Methods - wrappers containing a reference to the actual function 
-              this.render = renderThis;   // non-chainable method
-             // this.someMethodB = _(someMethodB);    // chainable method
+              this.render = _(renderThis);   // chainable method
+             // this.someMethodB = someMethodB;    // non-chainable method
         
               if (typeof args.init === "function")
                args.init.call(this, args);
@@ -127,7 +140,7 @@
        classCode = getPluginClass(pluginVersion),         // get a reference to the plugin OOP code
        classObject = new classCode({});                   // instantiate plugin Class (which is OOP)
     //   $.fn[getPluginName()] = classObject.rc;          // insert instantiated plugin into jQuery namespace
-       pluginObject = $.fn[pluginName] = classObject.chainability;
+       pluginObject = $.fn[pluginName] = classObject.chain;
        $.extend(pluginObject.prototype, classObject); // augment your plugin's prototype with your object
        $.extend(pluginObject, classObject);            // same here.
 
