@@ -31,6 +31,7 @@
      var classCode,
          classObject,
          error,
+         eventPool = args.pool,
          pluginName = args.name;
          
      /*  
@@ -39,7 +40,8 @@
                         return args.name;    // sets getPluginName() to return jQuery plugin name
                        };
                        */
-//     console && console.log(["Initialize", args.name, "plugin."].join(' '));                    
+                      
+     console && console.log("Initialize " + pluginName + " plugin.");                    
 
      try                                       // meat 
       {
@@ -52,15 +54,15 @@
       }
      catch (error)
       {
-       $(document).trigger("error." + pluginName,
-                           error);
-    //   alert(error);                           // in case something breaks let us know.
+       $(eventPool).trigger("error." + pluginName,
+                            error);                           // in case something breaks let us know.
       }
 
     }
        
    initPlugin({
-               name : config.name  // plugin name 
+               "name" : config.name,  // plugin name 
+               "pool" : config.pool || document  // event pool
               });   
  /*
    initPlugin({
@@ -207,6 +209,7 @@
     }
    */
   })(jQuery, 
-     {
-      "name" : "carousel"
+     {      
+      "name" : "carousel",
+      "pool" : document
      });
