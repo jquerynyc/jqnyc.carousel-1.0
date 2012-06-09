@@ -50,6 +50,11 @@
    
    function jQuerify(args)  
     {
+     var classCode, 
+         classObject,  
+         pluginName = config.name,
+         pluginObject;
+     
      console.log('ARGS: ', args);
      if (typeof args === 'function')
       {
@@ -60,6 +65,13 @@
       {
        console && console.log("Called as a property");
        initConfig(args);
+
+       classCode = getPluginClass(config.version),         // get a reference to the plugin OOP code
+       classObject = new classCode(args);                   // instantiate plugin Class (which is OOP)
+       pluginObject = $.fn[pluginName] = classObject.chainability;
+       $.extend(pluginObject.prototype, classObject); // augment your plugin's prototype with your object
+       $.extend(pluginObject, classObject);            // same here.
+                
        console && console.log(" > args: ", args);
        console && console.log(" > chainable: ", getConfig().chainable);
 
@@ -79,11 +91,24 @@
               // Version - directly exposed to be access via $(...).plugin.version
               this.version = pluginVersion;
               
+              // Public Methods - wrappers containing a reference to the actual function 
+              this.render = renderThis;   // non-chainable method
+             // this.someMethodB = _(someMethodB);    // chainable method
+        
+              if (typeof args.init === "function")
+               args.init.call(this, args);
+         
+              function renderThis()
+               {
+                console.log('render this');
+               }
+              
               initConfig(args);
               
               return this;
              };
     }
+   
        
    function initPlugin(args)
     {
@@ -112,12 +137,10 @@
 
        $.fn.extend({                            // now we overwrite jQuery's internal init() so we
                                                 // can intercept the selector and context.
-                    init: function( selector, context ) 
+                    init: function( selector, context, rootQuery ) 
                            {
-                          
-                            console.log(' SELECT: ', selector, " ", context, " > ", jqInitObject);
-                            jqInitObject = new jqInit(selector, context);
-                            console.log(' SELECT: ', selector, " ", context, " > ", jqInitObject);
+                            jqInitObject = new jqInit(selector, context, rootQuery);
+                            
                             return jqInitObject;
                            }
                    });

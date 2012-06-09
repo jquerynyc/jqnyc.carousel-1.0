@@ -55,7 +55,22 @@
        console.log('-----');
        console.log('Carousel chainability: ' + $(".jqnyc.carousel").carousel);
        console.log('Carousel Version: ' + $(".jqnyc.carousel").carousel.version);
-       console.log('Check chainability: ', $(".jqnyc.carousel").carousel());
+       
+       console.log('-----');
+       
+       console.log('Check chainability: ', $(".jqnyc.carousel").carousel({
+                                                                          "init" : function() { console.log('carousel re-init') } 
+                                                                         }));
+                                                                         
+       console.log('-----');
+       console.log('Carousel Version: ' + $(".jqnyc.carousel").carousel.version);
+       $(".jqnyc.carousel").carousel.render();                                             
+       console.log('-----');
+       console.log('Carousel Version: ' + $(".jqnyc.carousels").carousel.version);                                             
+
+       console.log('Check chainability: ', $(".jqnyc.carousels").carousel({
+                                                                          "init" : function() { console.log('carousels re-init') } 
+                                                                         }));             
       });
     </script>
   </head>
