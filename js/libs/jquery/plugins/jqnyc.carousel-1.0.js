@@ -26,13 +26,23 @@
 
 (function($, config)
   {
+   function getPluginClass(pluginVersion)
+    {
+     return function ()
+             {
+              this.version = pluginVersion;
+             };
+    }
+       
    function initPlugin(args)
     {
      var classCode,
          classObject,
          error,
          eventPool = args.pool,
-         pluginName = args.name;
+         pluginName = args.name,
+         pluginObject,
+         pluginVersion = args.version;
          
      /*  
      getPluginName = function()
@@ -41,16 +51,21 @@
                        };
                        */
                       
-     console && console.log("Initialize " + pluginName + " plugin.");                    
+     console && console.log("Initializing " + pluginName + " plugin.");                    
 
      try                                       // meat 
       {
-    //   classCode = getPluginClass(),       // get a reference to the plugin OOP code
-    //   classObject = new classCode({});                 // instantiate plugin Class (which is OOP)
+       classCode = getPluginClass(pluginVersion),         // get a reference to the plugin OOP code
+       classObject = new classCode({});                   // instantiate plugin Class (which is OOP)
     //   $.fn[getPluginName()] = classObject.rc;          // insert instantiated plugin into jQuery namespace
-       $.fn[pluginName] = function() {};
-    //   $.extend($.fn[getPluginName()].prototype, classObject);  // augment jQuery internals
-    //   $.extend($.fn[getPluginName()], classObject);            // same here.
+       pluginObject = $.fn[pluginName] = function() {};
+       $.extend(pluginObject.prototype, classObject); // augment your plugin's prototype with your object
+       $.extend(pluginObject, classObject);            // same here.
+
+       console && console.log(" > Retrieved class function: " , classCode);    
+       console && console.log(" > Instantiated class object: " , classObject);       
+       console && console.log("Initialized plugin object: " , pluginObject);
+       
       }
      catch (error)
       {
@@ -59,10 +74,12 @@
       }
 
     }
+    
        
    initPlugin({
-               "name" : config.name,  // plugin name 
-               "pool" : config.pool || document  // event pool
+               "name" : config.name || "unknown",  // plugin name 
+               "pool" : config.pool || document,   // event pool
+               "version" : config.version || "1.0" // plugin version
               });   
  /*
    initPlugin({
@@ -211,5 +228,6 @@
   })(jQuery, 
      {      
       "name" : "carousel",
-      "pool" : document
+      "pool" : document,
+      "version" : "1.0"
      });
