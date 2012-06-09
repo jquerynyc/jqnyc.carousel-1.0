@@ -26,11 +26,62 @@
 
 (function($, config)
   {
+   var jqInit = $.fn.init,
+       jqInitObject;
+   
+   // getConfig - always used to contain class/plugin arguments
+   function getConfig()
+    {
+     return undefined;       // we define this via setConfig()
+    }
+
+   // initConfig - sets default values via jQuery's extend()
+   function initConfig(args)
+    { 
+     setConfig($.extend({
+                         chainable : true,     // false - this allows us to do something like $(...).plugin(args).method()
+                                               //         this returns the object as the output
+                                               // true  - otherwise, by default, it will assume jQuery native functionality of chainability
+                                               //         this returns what jQuery expects for chaining
+                         properties : {}       // any properties that you want to be passed to the plugin.
+                        }, 
+                        args));
+    }
+   
+   function jQuerify(args)  
+    {
+     console.log('ARGS: ', args);
+     if (typeof args === 'function')
+      {
+       console && console.log("Called as a function");
+       return $.fn.curReturn.each(args);  // handles chaining of method
+      }
+     else
+      {
+       console && console.log("Called as a property");
+       initConfig(args);
+       console && console.log(" > args: ", args);
+       console && console.log(" > chainable: ", getConfig().chainable);
+
+       return getConfig().chainable       // checks for chaining in main plugin
+               ? jqInitObject             // returns chainability hook
+               : $.fn[getPluginName()];   // returns OOP object hook
+                                          // getPluginName() is defined in initPlugin()
+      }
+    }
+   
    function getPluginClass(pluginVersion)
     {
-     return function ()
+     return function (args)
              {
+              this.chainability = jQuerify;
+              
+              // Version - directly exposed to be access via $(...).plugin.version
               this.version = pluginVersion;
+              
+              initConfig(args);
+              
+              return this;
              };
     }
        
@@ -43,13 +94,6 @@
          pluginName = args.name,
          pluginObject,
          pluginVersion = args.version;
-         
-     /*  
-     getPluginName = function()
-                       {
-                        return args.name;    // sets getPluginName() to return jQuery plugin name
-                       };
-                       */
                       
      console && console.log("Initializing " + pluginName + " plugin.");                    
 
@@ -58,14 +102,26 @@
        classCode = getPluginClass(pluginVersion),         // get a reference to the plugin OOP code
        classObject = new classCode({});                   // instantiate plugin Class (which is OOP)
     //   $.fn[getPluginName()] = classObject.rc;          // insert instantiated plugin into jQuery namespace
-       pluginObject = $.fn[pluginName] = function() {};
+       pluginObject = $.fn[pluginName] = classObject.chainability;
        $.extend(pluginObject.prototype, classObject); // augment your plugin's prototype with your object
        $.extend(pluginObject, classObject);            // same here.
 
        console && console.log(" > Retrieved class function: " , classCode);    
        console && console.log(" > Instantiated class object: " , classObject);       
        console && console.log("Initialized plugin object: " , pluginObject);
-       
+
+       $.fn.extend({                            // now we overwrite jQuery's internal init() so we
+                                                // can intercept the selector and context.
+                    init: function( selector, context ) 
+                           {
+                          
+                            console.log(' SELECT: ', selector, " ", context, " > ", jqInitObject);
+                            jqInitObject = new jqInit(selector, context);
+                            console.log(' SELECT: ', selector, " ", context, " > ", jqInitObject);
+                            return jqInitObject;
+                           }
+                   });
+
       }
      catch (error)
       {
@@ -75,7 +131,15 @@
 
     }
     
-       
+   // setConfig - always used to set class/plugin arguments, usually used indirectly via initConfig
+   function setConfig(args)
+    {
+     getConfig = function()
+                  {
+                   return (args);
+                  };
+    }      
+           
    initPlugin({
                "name" : config.name || "unknown",  // plugin name 
                "pool" : config.pool || document,   // event pool
